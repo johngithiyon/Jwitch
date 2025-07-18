@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Start Streaming</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-zinc-900 text-white min-h-screen flex items-center justify-center">
+
+  <div class="bg-zinc-800 p-8 rounded-xl shadow-md w-full max-w-lg space-y-6">
+    <h2 class="text-2xl font-bold text-center">Start Your Stream</h2>
+
+    <label class="block">
+      <span class="text-sm text-gray-300">Stream Title</span>
+      <input type="text" id="title" class="mt-1 w-full px-4 py-2 rounded bg-zinc-700 focus:outline-none" placeholder="Enter stream title">
+    </label>
+
+    <label class="block">
+      <span class="text-sm text-gray-300">Description</span>
+      <textarea id="description" rows="3" class="mt-1 w-full px-4 py-2 rounded bg-zinc-700 focus:outline-none" placeholder="Enter description..."></textarea>
+    </label>
+
+    <button id="streamBtn" class="w-full bg-purple-600 hover:bg-purple-700 py-2 rounded">Start Stream</button>
+  </div>
+
+  <script>
+    const streamBtn = document.getElementById("streamBtn");
+
+    streamBtn.addEventListener("click", () => {
+      const title = document.getElementById("title").value.trim();
+      const description = document.getElementById("description").value.trim();
+
+      if (!title || !description) {
+        alert("Please fill out both title and description.");
+        return;
+      }
+      window.location.href = "http://localhost:8090/stream.html";
+    });
+  </script>
+
+</body>
+</html>

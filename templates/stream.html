@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Live Stream</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+</head>
+<body class="bg-zinc-900 text-white font-sans min-h-screen">
+
+  <header class="p-4 bg-zinc-800 flex justify-between items-center">
+    <h1 class="text-2xl font-bold">🔴 Live on Jwitch</h1>
+    <span class="text-sm text-gray-400">Viewers: 1</span>
+  </header>
+
+  <main class="p-6 flex flex-col items-center gap-6">
+    <video id="liveVideo" class="w-full max-w-4xl rounded" autoplay muted playsinline></video>
+  </main>
+  <center>
+  <button id="stopbtn" class="mt-4 p-2 bg-red-600 rounded">Stop Stream</button>
+  </center>
+  <script>
+
+
+
+  const websocket = new WebSocket("ws://localhost:8091/steam");
+
+  const constraints = { audio: true, video: true };
+  const options = {     mimeType: 'video/webm;codecs=vp8,opus'};
+  const liveVideo = document.getElementById("liveVideo");
+  const stopbtn = document.getElementById("stopbtn");
+
+  let mediarecorder;
+
+  websocket.onopen = () => {
+    console.log("WebSocket connected.")
+  };
+
+  navigator.mediaDevices.getUserMedia(constraints)
+    .then(function (stream) {
+      liveVideo.srcObject = stream;
+      mediarecorder = new MediaRecorder(stream, options);
+      mediarecorder.ondataavailable = (e) => {
+        if (e.data.size > 0 && websocket.readyState === WebSocket.OPEN) {
+          websocket.send(e.data);
+          console.log(e.data)
+        }
+      };
+
+      mediarecorder.start(200);
+    })
+    .catch(function (err) {
+      alert("Camera/mic error: " + err);
+    });
+
+  stopbtn.addEventListener("click", function () {
+    mediarecorder.stop();
+    alert("Recording stopped.");
+ 
+  });
+  
+  const hlsUrl = 'http://localhost:8099/hls/stream.m3u8';
+
+  if (Hls.isSupported()) {
+      const hls = new Hls();
+      hls.loadSource(hlsUrl);
+      hls.attachMedia(liveVideo);
+      hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        liveVideo.play();
+      });
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      // Fallback for Safari
+      liveVideo.src = hlsUrl;
+      liveVideo.addEventListener('loadedmetadata', () => {
+        liveVideo.play();
+      });
+    } else {
+      alert('Your browser does not support HLS.');
+    }
+  </script>
+</body>
+</html>
