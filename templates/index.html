@@ -28,7 +28,8 @@
         <!-- Stream Card -->
         <div class="w-64 flex-shrink-0 bg-zinc-800 rounded-lg overflow-hidden shadow hover:scale-105 transition">
           <div class="relative">
-            <video id="video"></video>
+          <a href="http://localhost:8095/livevideo.html"><video id="video" class="w-full cursor-pointer" muted playsinline  poster="https://placehold.co/320x180?text=Live+Stream+Click+to+Watch"></a>
+            </video>
             <span class="absolute top-2 left-2 bg-red-600 text-white text-xs px-2 py-0.5 rounded">LIVE</span>
             <span class="absolute bottom-2 right-2 bg-black bg-opacity-60 text-xs px-2 py-0.5 rounded">6.1K viewers</span>
           </div>
@@ -46,7 +47,7 @@
     const startbtn = document.getElementById("startbtn");
   
     startbtn.addEventListener("click", function () {
-         window.location.href = "http://localhost:8090/form.html"
+         window.location.href = "http://localhost:8095/form.html"
     });
   </script>
   

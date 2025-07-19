@@ -41,6 +41,10 @@ func handle_stream(w http.ResponseWriter,r *http.Request) {
     tmpl.Execute(w,nil)
 }
 
+func handle_live(w http.ResponseWriter, r *http.Request) {
+    http.ServeFile(w, r, "templates/livevideo.html")
+}
+
 
 func main() {
  
@@ -52,6 +56,7 @@ func main() {
     http.HandleFunc("/login",include.Handle_login)
     http.HandleFunc("/form.html",handle_form)
     http.HandleFunc("/stream.html",handle_stream)
+    http.HandleFunc("/livevideo.html",handle_live)
     fmt.Println("Server is Listening .......")
-    http.ListenAndServe(":8090", nil)
+    http.ListenAndServe(":8095", nil)
 }

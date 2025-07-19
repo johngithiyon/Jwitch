@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Live Stream</title> 
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+</head>
+<body>
+  <video id="video" controls autoplay style="width: 100%; max-width: 720px;"></video>
+  <script>
+        const video = document.getElementById('video');
+
+                if (Hls.isSupported()) {
+                const hls = new Hls();
+
+                hls.loadSource('http://localhost:8099/hls/stream.m3u8');
+                hls.attachMedia(video);
+
+                hls.on(Hls.Events.ERROR, function (event, data) {
+                    console.error('HLS.js error:', data);
+                });
+
+                } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                // For Safari
+                video.src = 'http://localhost:8099/hls/stream.m3u8';
+                } else {
+                alert("HLS not supported in this browser.");
+                };
+  </script>
+</body>
+</html

@@ -15,7 +15,7 @@
   </header>
 
   <main class="p-6 flex flex-col items-center gap-6">
-    <video id="liveVideo" class="w-full max-w-4xl rounded" autoplay muted playsinline></video>
+    <video id="liveVideo" class="w-full max-w-4xl rounded" autoplay></video>
   </main>
   <center>
   <button id="stopbtn" class="mt-4 p-2 bg-red-600 rounded">Stop Stream</button>
@@ -60,24 +60,6 @@
  
   });
   
-  const hlsUrl = 'http://localhost:8099/hls/stream.m3u8';
-
-  if (Hls.isSupported()) {
-      const hls = new Hls();
-      hls.loadSource(hlsUrl);
-      hls.attachMedia(liveVideo);
-      hls.on(Hls.Events.MANIFEST_PARSED, () => {
-        liveVideo.play();
-      });
-    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-      // Fallback for Safari
-      liveVideo.src = hlsUrl;
-      liveVideo.addEventListener('loadedmetadata', () => {
-        liveVideo.play();
-      });
-    } else {
-      alert('Your browser does not support HLS.');
-    }
   </script>
 </body>
 </html>
