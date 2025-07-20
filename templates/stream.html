@@ -2,64 +2,98 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Live Stream</title>
+  <title>Stream to RTMP</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 </head>
-<body class="bg-zinc-900 text-white font-sans min-h-screen">
+<body class="bg-zinc-900 text-white h-screen">
 
-  <header class="p-4 bg-zinc-800 flex justify-between items-center">
-    <h1 class="text-2xl font-bold">🔴 Live on Jwitch</h1>
-    <span class="text-sm text-gray-400">Viewers: 1</span>
-  </header>
+  <!-- Full page container -->
+  <div class="flex h-screen">
 
-  <main class="p-6 flex flex-col items-center gap-6">
-    <video id="liveVideo" class="w-full max-w-4xl rounded" autoplay></video>
-  </main>
-  <center>
-  <button id="stopbtn" class="mt-4 p-2 bg-red-600 rounded">Stop Stream</button>
-  </center>
+    <!-- Left: Live video streaming -->
+    <div class="flex-1 flex items-center justify-center bg-black">
+      <video id="liveVideo" class="w-full max-w-[900px] rounded-lg shadow-lg" autoplay muted></video>
+    </div>
+
+    <!-- Right: Chat panel -->
+    <div class="w-full sm:w-[350px] flex flex-col bg-zinc-800 border-l border-zinc-700">
+      <div class="bg-zinc-900 p-3 text-lg font-semibold border-b border-zinc-700">💬 Stream Chat</div>
+
+      <div id="chatBox" class="flex-1 overflow-y-auto p-3 space-y-3 text-sm">
+        <!-- Messages go here -->
+        <div class="text-gray-300"><strong class="text-purple-400">👑 Admin</strong> Welcome to the stream!</div>
+      </div>
+
+      <form id="chatForm" class="flex border-t border-zinc-700 p-2">
+        <input id="chatInput" type="text" placeholder="Send a message" class="flex-1 bg-zinc-700 text-white p-2 rounded-l focus:outline-none" />
+        <button type="submit" class="bg-purple-600 px-4 rounded-r text-white">Send</button>
+      </form>
+    </div>
+
+  </div>
+
+  <!-- Stop Button -->
+  <button id="stopbtn" class="fixed bottom-4 left-4 bg-red-600 px-4 py-2 rounded shadow-lg">⏹ Stop Stream</button>
+
+  <!-- JavaScript -->
   <script>
+    const websocket = new WebSocket("ws://localhost:8091/steam");
+    const chatsocket = new WebSocket("ws://localhost:8091/chat");
 
+    const constraints = { audio: true, video: true };
+    const options = { mimeType: 'video/webm;codecs=vp8,opus' };
+    const liveVideo = document.getElementById("liveVideo");
+    const stopbtn = document.getElementById("stopbtn");
 
+    let mediarecorder;
 
-  const websocket = new WebSocket("ws://localhost:8091/steam");
+    websocket.onopen = () => {
+      console.log("Streaming WebSocket connected.");
+    };
 
-  const constraints = { audio: true, video: true };
-  const options = {  mimeType: 'video/webm;codecs=vp8,opus'};
-  const liveVideo = document.getElementById("liveVideo");
-  const stopbtn = document.getElementById("stopbtn");
+    navigator.mediaDevices.getUserMedia(constraints)
+      .then(function (stream) {
+        liveVideo.srcObject = stream;
+        mediarecorder = new MediaRecorder(stream, options);
 
-  let mediarecorder;
+        mediarecorder.ondataavailable = (e) => {
+          if (e.data.size > 0 && websocket.readyState === WebSocket.OPEN) {
+            websocket.send(e.data);
+          }
+        };
 
-  websocket.onopen = () => {
-    console.log("WebSocket connected.")
-  };
+        mediarecorder.start(200); // send chunks every 200ms
+      })
+      .catch(function (err) {
+        alert("Camera/mic error: " + err);
+      });
 
-  navigator.mediaDevices.getUserMedia(constraints)
-    .then(function (stream) {
-      liveVideo.srcObject = stream;
-      mediarecorder = new MediaRecorder(stream, options);
-      mediarecorder.ondataavailable = (e) => {
-        if (e.data.size > 0 && websocket.readyState === WebSocket.OPEN) {
-          websocket.send(e.data);
-          console.log(e.data)
-        }
-      };
-
-      mediarecorder.start(200);
-    })
-    .catch(function (err) {
-      alert("Camera/mic error: " + err);
+    stopbtn.addEventListener("click", function () {
+      mediarecorder.stop();
+      alert("Recording stopped.");
     });
 
-  stopbtn.addEventListener("click", function () {
-    mediarecorder.stop();
-    alert("Recording stopped.");
- 
-  });
-  
+    // Chat logic
+    const chatForm = document.getElementById("chatForm");
+    const chatInput = document.getElementById("chatInput");
+    const chatBox = document.getElementById("chatBox");
+
+    chatForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      if (chatsocket.readyState === WebSocket.OPEN) {
+        chatsocket.send(chatInput.value);
+        chatInput.value = "";
+      } else {
+        console.log("Chat WebSocket is not open for streamer");
+      }
+    });
+
+    chatsocket.onmessage = (event) => {
+      const msg = document.createElement("div");
+      msg.innerHTML = `<strong class="text-green-400"></strong> ${event.data}`;
+      chatBox.appendChild(msg);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    };
   </script>
 </body>
 </html>

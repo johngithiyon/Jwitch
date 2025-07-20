@@ -1,16 +1,66 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Live Stream</title> 
+  <meta charset="UTF-8" />
+  <title>Live Stream</title>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-  <video id="video" controls autoplay style="width: 100%; max-width: 720px;"></video>
-  <script>
-           const hls = new Hls();
+<body class="bg-zinc-900 text-white h-screen">
 
-            hls.loadSource('http://localhost:8099/hls/stream.m3u8');
-            hls.attachMedia(video);
-</script>
+  <!-- Page container -->
+  <div class="flex h-screen">
+    
+    <!-- Video section -->
+    <div class="flex-1 flex items-center justify-center bg-black">
+      <video id="video" controls autoplay class="w-full max-w-[900px] rounded-lg shadow-lg"></video>
+    </div>
+
+    <!-- Chat panel -->
+    <div class="w-full sm:w-[350px] flex flex-col bg-zinc-800 border-l border-zinc-700">
+      <div class="bg-zinc-900 p-3 text-lg font-semibold border-b border-zinc-700">💬 Stream Chat</div>
+
+      <div id="chatBox" class="flex-1 overflow-y-auto p-3 space-y-3 text-sm">
+        <!-- Messages go here -->
+        <div class="text-gray-300"><strong class="text-purple-400">User</strong> Welcome to the stream!</div>
+      </div>
+
+      <form id="chatForm" class="flex border-t border-zinc-700 p-2">
+        <input id="chatInput" type="text" placeholder="Send a message" class="flex-1 bg-zinc-700 text-white p-2 rounded-l focus:outline-none" />
+        <button type="submit" class="bg-purple-600 px-4 rounded-r text-white">Send</button>
+      </form>
+    </div>
+
+  </div>
+
+  <script>
+    const video = document.getElementById("video");
+    const hls = new Hls();
+    hls.loadSource('http://localhost:8099/hls/stream.m3u8');
+    hls.attachMedia(video);
+
+    // WebSocket chat
+    const chatsocket = new WebSocket("ws://localhost:8091/chat");
+    const chatForm = document.getElementById("chatForm");
+    const chatInput = document.getElementById("chatInput");
+    const chatBox = document.getElementById("chatBox");
+
+    chatForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      if (chatsocket.readyState === WebSocket.OPEN) {
+        chatsocket.send(chatInput.value);
+        chatInput.value = "";
+      } else {
+        console.log("Chat WebSocket is not open for viewer");
+      }
+    });
+
+    chatsocket.onmessage = (event) => {
+      const msg = document.createElement("div");
+      msg.innerHTML = `<strong class="text-green-400"></strong> ${event.data}`;
+      chatBox.appendChild(msg);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    };
+  </script>
 </body>
 </html>
