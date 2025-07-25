@@ -23,9 +23,9 @@
 
     <!-- Category Section -->
     <section>
-      <h2 class="text-xl font-semibold mb-4">Party Games</h2>
       <div class="flex gap-6 overflow-x-auto pb-4">
         <!-- Stream Card -->
+         {{range .}}
         <div class="w-64 flex-shrink-0 bg-zinc-800 rounded-lg overflow-hidden shadow hover:scale-105 transition">
           <div class="relative">
           <a href="http://localhost:8095/livevideo.html"><video id="video" class="w-full cursor-pointer" muted playsinline  poster="https://placehold.co/320x180?text=Live+Stream+Click+to+Watch"></a>
@@ -33,23 +33,46 @@
             <span class="absolute top-2 left-2 bg-red-600 text-white text-xs px-2 py-0.5 rounded">LIVE</span>
             <span class="absolute bottom-2 right-2 bg-black bg-opacity-60 text-xs px-2 py-0.5 rounded">6.1K viewers</span>
           </div>
-          <div class="p-3">
-            <p class="text-sm font-semibold truncate">Mario Kart 初プレイ</p>
-            <p class="text-xs text-gray-400">ゆうた初見</p>
+          <div class="card" data-id="{{.Id}}">
+            <p class="text-sm font-semibold truncate" id="title">{{.Title}}</p>
+            <p class="text-xs text-gray-400" id="desc">{{.Description}}</p>
           </div>
         </div>
+        {{end}}
       </div>
     </section>
   </main>
 
   <script>
+//          const card = document.querySelector(".card")
+
+//          let  id = 0
+
+//          if(card) {
+//             id = card.dataset.id
+
+//           fetch("http://localhost:8095/session", {
+//           method: "POST", 
+//           headers: {
+//               "Content-Type": "application/x-www-form-urlencoded"
+//           },
+//           body: new URLSearchParams({
+//               id: id 
+//           })
+// })
+
+//          }
+                  
+         const submit = document.getElementById("startbtn")
   
-    const startbtn = document.getElementById("startbtn");
-  
-    startbtn.addEventListener("click", function () {
-         window.location.href = "http://localhost:8095/form.html"
-    });
-  </script>
+
+         submit.addEventListener("click",() => {
+              window.location.href = "http://localhost:8095/form.html"
+         })
+         
+
+
+</script>
   
 </body>
 </html>

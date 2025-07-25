@@ -1,9 +1,10 @@
 package include
 
 import (
-	"fmt"
 	"context"
+	"fmt"
 	"html/template"
+	"io"
 	"net/http"
 )
 
@@ -90,8 +91,116 @@ func Handle_signup(w http.ResponseWriter,r *http.Request) {
 
 
 		}
+}
+
+func Handle_form(w http.ResponseWriter,r *http.Request) {
+
+	if r.Method == http.MethodGet {
+		tmpl , err := template.ParseFiles("templates/form.html")
+		if err != nil {
+			fmt.Println("Error",err)
+			http.Error(w,"Template Error",500)
+			return
+		}
+		tmpl.Execute(w,nil)
+		return
+	}
+
+	if r.Method == http.MethodPost {
+           var title = r.FormValue("title")
+
+		   var description = r.FormValue("description")
+
+		   _, err := Conn.Exec(context.Background(),
+		   "INSERT INTO streams (title, description) VALUES ($1, $2)", title, description)
+	   if err != nil {
+		   http.Error(w, "DB Error", 500)
+		   return
+	   } else {
+		    http.ServeFile(w,r,"templates/stream.html")
+	   }
+	      
+	}
+}
+
+type Stream struct 
+{
+	 Id int
+	 Title string 
+	 Description string
+}
+
+var streamer_id int
+
+func Fetch_form() ([] Stream) {
+
+     var stream [] Stream
+	 var title , description string
+     var id int
+
+	  rows, err := Conn.Query(context.Background(), "SELECT id,title, description FROM streams")
+
+	  if err != nil {
+		fmt.Println("Fetch error",err)
+      }
+     
+	 defer func()  {
+		rows.Close()
+	} ()
+	  
+	  for rows.Next() {
 
 
+		    err := rows.Scan(&id,&title,&description)
+
+			if err != nil {
+				fmt.Println("Scan error",err)
+			}
+
+
+		streamer_id = id
+
+	    stream = append(stream, Stream{
+			Id : id,
+			Title: title,
+			Description: description,
+		}) 
+	  }
+
+
+      
+	  return  stream
 }
 
 
+func Stopstream(w http.ResponseWriter,r *http.Request) {
+
+	fmt.Println("stop endpoint is hit")
+       
+	if r.Method == http.MethodPost {
+
+		 var streamID = streamer_id
+           
+		  body , err := io.ReadAll(r.Body)
+
+		 if err != nil {
+			 fmt.Println("Error in the read body",err)
+		 }
+
+		message := string(body)
+
+		if message == "stopping" {
+			_, err := Conn.Exec(context.Background(), "DELETE FROM streams WHERE id = $1", streamID)
+			fmt.Println("It is sucessfully delete the stream")
+
+		if err != nil {
+			   fmt.Println("It did not return proper body noway",err)
+		}
+
+
+	}
+	  
+	}
+}
+	
+    

@@ -10,6 +10,9 @@ import (
 
 func handle_home(w http.ResponseWriter, r *http.Request) {
     tmpl, err := template.ParseFiles("templates/index.html")
+
+    steam_info := include.Fetch_form()
+
     if err != nil {
         fmt.Println("Error",err)
         http.Error(w, "Template error",500)
@@ -17,29 +20,9 @@ func handle_home(w http.ResponseWriter, r *http.Request) {
     }
 
 
-    tmpl.Execute(w,nil)
+    tmpl.Execute(w,steam_info)
 }
 
- 
-func handle_form(w http.ResponseWriter,r *http.Request) {
-    tmpl,err := template.ParseFiles("templates/form.html")
-    if err != nil {
-        http.Error(w,"Template Error",500)
-        return
-    }
-
-    tmpl.Execute(w,nil)
-}
-
-func handle_stream(w http.ResponseWriter,r *http.Request) {
-    tmpl,err := template.ParseFiles("templates/stream.html")
-    if err != nil {
-        http.Error(w,"Template Error",500)
-        return
-    }
-
-    tmpl.Execute(w,nil)
-}
 
 func handle_live(w http.ResponseWriter, r *http.Request) {
     http.ServeFile(w, r, "templates/livevideo.html")
@@ -54,9 +37,9 @@ func main() {
     http.HandleFunc("/", handle_home)
     http.HandleFunc("/signup",include.Handle_signup)
     http.HandleFunc("/login",include.Handle_login)
-    http.HandleFunc("/form.html",handle_form)
-    http.HandleFunc("/stream.html",handle_stream)
+    http.HandleFunc("/form.html",include.Handle_form)
     http.HandleFunc("/livevideo.html",handle_live)
+    http.HandleFunc("/stop-stream",include.Stopstream)
     fmt.Println("Server is Listening .......")
     http.ListenAndServe(":8095", nil)
 }
