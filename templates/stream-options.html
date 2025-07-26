@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Select Stream Source</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white flex items-center justify-center min-h-screen">
+  <div class="bg-gray-800 p-8 rounded-2xl shadow-xl w-full max-w-md text-center">
+    <h2 class="text-2xl font-bold mb-6 text-blue-400">Choose Your Stream Source</h2>
+    
+    <p class="mb-4 text-gray-300">How would you like to start your stream?</p>
+
+    <div class="flex flex-col gap-4">
+      <button
+        onclick="stream_cam()"
+        class="bg-blue-500 hover:bg-blue-600 transition duration-200 px-4 py-3 rounded-xl font-semibold"
+      >
+        📷 Stream from Camera
+      </button>
+
+      <button
+        onclick="stream_screen()"
+        class="bg-green-500 hover:bg-green-600 transition duration-200 px-4 py-3 rounded-xl font-semibold"
+      >
+        🖥️ Stream your Screen
+      </button>
+    </div>
+
+    <p class="mt-6 text-sm text-gray-500">You can stop your stream anytime from the dashboard.</p>
+  </div>
+
+  <script> 
+    function stream_cam() {
+          window.location.href = "http://localhost:8095/stream.html"
+    }
+
+    function stream_screen() {
+        window.location.href = ""
+    }
+  </script>
+</body>
+</html>

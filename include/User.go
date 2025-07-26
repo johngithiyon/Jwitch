@@ -110,14 +110,14 @@ func Handle_form(w http.ResponseWriter,r *http.Request) {
            var title = r.FormValue("title")
 
 		   var description = r.FormValue("description")
-
+            
 		   _, err := Conn.Exec(context.Background(),
 		   "INSERT INTO streams (title, description) VALUES ($1, $2)", title, description)
 	   if err != nil {
 		   http.Error(w, "DB Error", 500)
 		   return
-	   } else {
-		    http.ServeFile(w,r,"templates/stream.html")
+	   }  else {
+		http.Redirect(w,r,"http://localhost:8095/stream-options",http.StatusSeeOther)
 	   }
 	      
 	}

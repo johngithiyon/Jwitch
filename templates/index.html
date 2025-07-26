@@ -33,7 +33,7 @@
             <span class="absolute top-2 left-2 bg-red-600 text-white text-xs px-2 py-0.5 rounded">LIVE</span>
             <span class="absolute bottom-2 right-2 bg-black bg-opacity-60 text-xs px-2 py-0.5 rounded">6.1K viewers</span>
           </div>
-          <div class="card" data-id="{{.Id}}">
+          <div class="card">
             <p class="text-sm font-semibold truncate" id="title">{{.Title}}</p>
             <p class="text-xs text-gray-400" id="desc">{{.Description}}</p>
           </div>
@@ -44,24 +44,6 @@
   </main>
 
   <script>
-//          const card = document.querySelector(".card")
-
-//          let  id = 0
-
-//          if(card) {
-//             id = card.dataset.id
-
-//           fetch("http://localhost:8095/session", {
-//           method: "POST", 
-//           headers: {
-//               "Content-Type": "application/x-www-form-urlencoded"
-//           },
-//           body: new URLSearchParams({
-//               id: id 
-//           })
-// })
-
-//          }
                   
          const submit = document.getElementById("startbtn")
   
