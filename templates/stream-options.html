@@ -32,11 +32,26 @@
 
   <script> 
     function stream_cam() {
+              fetch("/steamtype", {
+              method: "POST",
+              headers: {
+            "Content-Type": "text/plain"
+            },
+            body: "video"
+            });
+
           window.location.href = "http://localhost:8095/stream.html"
     }
 
     function stream_screen() {
-        window.location.href = ""
+      fetch("/steamtype", {
+              method: "POST",
+              headers: {
+            "Content-Type": "text/plain"
+            },
+            body: "screen"
+            });
+        window.location.href = "http://localhost:8095/stream_screen"
     }
   </script>
 </body>

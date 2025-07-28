@@ -8,10 +8,18 @@ import (
 	
 )
 
+type homedata struct {
+    Steam_info [] include.Stream
+    Steamtype  string
+}
+
 func handle_home(w http.ResponseWriter, r *http.Request) {
     tmpl, err := template.ParseFiles("templates/index.html")
 
-    steam_info := include.Fetch_form()
+    data := homedata{
+           Steam_info: include.Fetch_form(),
+           Steamtype: include.Steamtypevar,
+    }
 
     if err != nil {
         fmt.Println("Error",err)
@@ -20,7 +28,7 @@ func handle_home(w http.ResponseWriter, r *http.Request) {
     }
 
 
-    tmpl.Execute(w,steam_info)
+    tmpl.Execute(w,data)
 }
 
 
@@ -40,6 +48,10 @@ func screen_stream(w http.ResponseWriter, r *http.Request) {
      http.ServeFile(w,r,"templates/stream_screen.html")
 }
 
+func handle_screen(w http.ResponseWriter,r *http.Request) {
+    http.ServeFile(w,r,"templates/livescreen.html")
+}
+
 func main() {
  
    include.GetConnection()
@@ -53,7 +65,9 @@ func main() {
     http.HandleFunc("/stop-stream",include.Stopstream)
     http.HandleFunc("/stream-options",streamoptions)
     http.HandleFunc("/stream.html",cam_stream)
-    http.HandleFunc("/stream_screen.html",screen_stream)
+    http.HandleFunc("/stream_screen",screen_stream)
+    http.HandleFunc("/steamtype",include.Steamtype)
+    http.HandleFunc("/livescreen.html",handle_screen)
     fmt.Println("Server is Listening .......")
     http.ListenAndServe(":8095", nil)
 }

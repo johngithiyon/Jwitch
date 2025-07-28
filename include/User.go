@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"io"
 	"net/http"
+	"strings"
 )
 
 
@@ -43,11 +44,8 @@ func Handle_signup(w http.ResponseWriter,r *http.Request) {
               http.Error(w,"DB Error",500)
 			  return
 		} else {
-			 templ , err := template.ParseFiles("templates/index.html")
-             if err != nil {
-				return
-			 }
-			 templ.Execute(w,nil)
+			http.Redirect(w,r,"templates/index.html",http.StatusSeeOther)
+			return
 		}
 	}
 }
@@ -60,8 +58,8 @@ func Handle_signup(w http.ResponseWriter,r *http.Request) {
 				fmt.Println("Error",err)
 				http.Error(w,"Template Error",500)
 				return
-			}
-	 
+			} 
+
 			tmpl.Execute(w,nil)
 			return
 	    }
@@ -80,11 +78,7 @@ func Handle_signup(w http.ResponseWriter,r *http.Request) {
 				http.Error(w,"DB Error",500)
 				return
 			} else {
-				templ , err := template.ParseFiles("templates/index.html")
-				if err != nil {
-				   return
-				}
-				templ.Execute(w,nil)
+				http.Redirect(w,r,"templates/index.html",http.StatusSeeOther)
 		   }
 
 			fmt.Println("Welcome Back",username)
@@ -93,35 +87,40 @@ func Handle_signup(w http.ResponseWriter,r *http.Request) {
 		}
 }
 
-func Handle_form(w http.ResponseWriter,r *http.Request) {
-
+func Handle_form(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
-		tmpl , err := template.ParseFiles("templates/form.html")
+		tmpl, err := template.ParseFiles("templates/form.html")
 		if err != nil {
-			fmt.Println("Error",err)
-			http.Error(w,"Template Error",500)
+			fmt.Println("Error", err)
+			http.Error(w, "Template Error", 500)
 			return
 		}
-		tmpl.Execute(w,nil)
+		tmpl.Execute(w, nil)
 		return
 	}
 
 	if r.Method == http.MethodPost {
-           var title = r.FormValue("title")
+		title := r.FormValue("title")
+		description := r.FormValue("description")
 
-		   var description = r.FormValue("description")
-            
-		   _, err := Conn.Exec(context.Background(),
-		   "INSERT INTO streams (title, description) VALUES ($1, $2)", title, description)
-	   if err != nil {
-		   http.Error(w, "DB Error", 500)
-		   return
-	   }  else {
-		http.Redirect(w,r,"http://localhost:8095/stream-options",http.StatusSeeOther)
-	   }
-	      
+
+		if strings.TrimSpace(title) == "" || strings.TrimSpace(description) == "" {
+			http.Error(w, "Please fill in all fields", http.StatusBadRequest)
+			return
+		}
+
+		_, err := Conn.Exec(context.Background(),
+			"INSERT INTO streams (title, description) VALUES ($1, $2)", title, description)
+		if err != nil {
+			http.Error(w, "DB Error", 500)
+			return
+		}
+
+		
+		http.Redirect(w, r, "http://localhost:8095/stream-options", http.StatusSeeOther)
 	}
 }
+
 
 type Stream struct 
 {
@@ -201,6 +200,20 @@ func Stopstream(w http.ResponseWriter,r *http.Request) {
 	}
 	  
 	}
+}
+
+var Steamtypevar string
+
+func Steamtype(w http.ResponseWriter,r *http.Request) {
+      
+     body , err := io.ReadAll(r.Body)
+
+	 if err != nil {
+		fmt.Println("There is a problem in the type coming",err)
+	 }
+
+	 Steamtypevar= string(body)
+
 }
 	
     

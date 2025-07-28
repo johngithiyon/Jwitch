@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Jwitch</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -10,51 +10,55 @@
 
   <!-- Navbar -->
   <header class="flex items-center justify-between px-6 py-4 bg-zinc-800 shadow">
-    <div class="text-2xl font-bold">Jwitch </div>
+    <div class="text-2xl font-bold">Jwitch</div>
     <input type="text" placeholder="Search" class="px-4 py-2 rounded bg-zinc-700 w-1/3 focus:outline-none">
     <div class="flex items-center gap-4">
-      <button class="bg-purple-600 px-4 py-2 rounded hover:bg-purple-700"  id="startbtn">Go Live</button>
+      <button class="bg-purple-600 px-4 py-2 rounded hover:bg-purple-700" id="startbtn">Go Live</button>
       <div class="w-8 h-8 rounded-full bg-gray-500"></div>
     </div>
   </header>
 
-  <!-- Categories -->
+  <!-- Stream Category Section -->
   <main class="p-6 space-y-12">
-
-    <!-- Category Section -->
     <section>
       <div class="flex gap-6 overflow-x-auto pb-4">
-        <!-- Stream Card -->
-         {{range .}}
-        <div class="w-64 flex-shrink-0 bg-zinc-800 rounded-lg overflow-hidden shadow hover:scale-105 transition">
-          <div class="relative">
-          <a href="http://localhost:8095/livevideo.html"><video id="video" class="w-full cursor-pointer" muted playsinline  poster="https://placehold.co/320x180?text=Live+Stream+Click+to+Watch"></a>
-            </video>
-            <span class="absolute top-2 left-2 bg-red-600 text-white text-xs px-2 py-0.5 rounded">LIVE</span>
-            <span class="absolute bottom-2 right-2 bg-black bg-opacity-60 text-xs px-2 py-0.5 rounded">6.1K viewers</span>
-          </div>
-          <div class="card">
-            <p class="text-sm font-semibold truncate" id="title">{{.Title}}</p>
-            <p class="text-xs text-gray-400" id="desc">{{.Description}}</p>
-          </div>
-        </div>
+        {{range .Steam_info}}
+          {{if eq $.Steamtype "video"}}
+            <!-- If it's a video stream -->
+            <a href="http://localhost:8095/livevideo.html">
+              <video class="w-full cursor-pointer" muted playsinline poster="Live Video Stream"></video>
+              <div class="mt-2">
+                <p class="text-white font-semibold">{{.Title}}</p>
+                <p class="text-gray-400 text-sm">{{.Description}}</p>
+              </div>
+            </a>
+          {{else if eq $.Steamtype "screen"}}
+            <!-- If it's a screen stream -->
+            <a href="http://localhost:8095/livescreen.html">
+              <video class="w-full cursor-pointer" muted playsinline poster="Screen Share Stream"></video>
+              <div class="mt-2">
+                <p class="text-white font-semibold">{{.Title}}</p>
+                <p class="text-gray-400 text-sm">{{.Description}}</p>
+              </div>
+            </a>
+          {{else}}
+            <!-- If stream type is not recognized -->
+            <p class="text-red-500">Unknown stream type</p>
+          {{end}}
         {{end}}
       </div>
     </section>
   </main>
 
+  <!-- Go Live Button Logic -->
   <script>
-                  
-         const submit = document.getElementById("startbtn")
-  
+    const submit = document.getElementById("startbtn");
+    submit.addEventListener("click", () => {
+      window.location.href = "http://localhost:8095/form.html";
+    });
 
-         submit.addEventListener("click",() => {
-              window.location.href = "http://localhost:8095/form.html"
-         })
-         
+    console.log("script is running")
+  </script>
 
-
-</script>
-  
 </body>
 </html>
